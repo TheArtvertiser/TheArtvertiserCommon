@@ -79,6 +79,7 @@ class ofxFern{
 		planar_pattern_detector * detector;
 		template_matching_based_tracker * tracker;
 		bool last_frame_ok;
+		bool ok;
 
 		bool is_initialized;
 		

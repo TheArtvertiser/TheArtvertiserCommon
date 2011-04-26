@@ -20,6 +20,7 @@ ofxFern::ofxFern(){
 	is_initialized = false;
 	last_detected.resize(8);
 	last_tracked.resize(8);
+	ok = false;
 
 	state = NotInitialized;
 }
@@ -102,7 +103,7 @@ void ofxFern::draw_recognized_keypoints(planar_pattern_detector * detector){
 //------------------------------------------------------------------------
 void ofxFern::detect(IplImage * frame){
 	//last_frame_ok=false;
-	static bool ok = false;
+	//static bool ok = false;
 	//cout << "mode: " << mode;
 	if (mode == 1 || ((mode==0) && ok)) {
 		//cout << " trying to track";
@@ -185,6 +186,8 @@ void ofxFern::detect(IplImage * frame){
 //------------------------------------------------------------------------
 void ofxFern::initTracker(string marker, int width, int height){
 	state = Initializing;
+	ok = false;
+	last_frame_ok = false;
 	img.allocate(width, height); 
 	marker = ofToDataPath(marker);
 

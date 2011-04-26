@@ -22,6 +22,12 @@ public:
 	string getUID() const;
 	void setUID(const string & uid);
 
+	string getAliasUID() const;
+	void setAliasUID(const string & uid);
+	bool hasAlias() const;
+
+	Artvert getAlias();
+
 	bool isReady();
 
 	ofFile & getCompressedImage();
@@ -42,8 +48,17 @@ public:
 
 	static vector<Artvert> listAll(string folder=DEFAULT_ARTVERT_FOLDER);
 
+	//this allows to compare artverts by their paths, also provides sorting and use as key in stl containers
+	bool operator==(const Artvert & file) const;
+	bool operator!=(const Artvert & file) const;
+	bool operator<(const Artvert & file) const;
+	bool operator<=(const Artvert & file) const;
+	bool operator>(const Artvert & file) const;
+	bool operator>=(const Artvert & file) const;
+
 private:
 	string uid;
+	string aliasUID;
 	string folder;
 	ofFile compressedImage;
 	ofFile model;

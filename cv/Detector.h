@@ -18,7 +18,8 @@ public:
 	virtual ~Detector();
 
 	void close();
-	void setup(string model, ofVideoGrabber & video, const vector<ofPoint> & srcQuad);
+	void setup(string model, int width, int height, const vector<ofPoint> & srcQuad, bool lock=false);
+	void setup(string model, ofVideoGrabber & video, const vector<ofPoint> & srcQuad, bool lock=false);
 	void setupTrainOnly(string model);
 	void newFrame(ofPixels & pixels);
 
@@ -41,6 +42,7 @@ protected:
 	void threadedFunction();
 
 private:
+	void init();
 	ofVideoGrabber * video;
 	int width,height;
 	ofxCvColorImage colorImg;

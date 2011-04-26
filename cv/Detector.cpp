@@ -27,7 +27,32 @@ void Detector::close(){
 	state = Init;
 }
 
-void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoint> & _srcQuad){
+void Detector::setup(string _model, int _width, int _height, const vector<ofPoint> & _srcQuad, bool lock){
+	video = NULL;
+	model = _model;
+
+	srcQuad = _srcQuad;
+
+	fern.setUseTexture(false);
+	fern.setMode('5');
+	fern.setMode('0');
+
+	width = _width;
+	height = _height;
+
+	colorImg.allocate(width,height);
+	img.allocate(width,height);
+	img.setUseTexture(false);
+	colorImg.setUseTexture(false);
+
+
+	trainOnly = false;
+	state = Initializing;
+	if(!lock) startThread(true,false);
+	else init();
+}
+
+void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoint> & _srcQuad, bool lock){
 	model = _model;
 	video = &_video;
 	srcQuad = _srcQuad;
@@ -44,10 +69,10 @@ void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoin
 	//img640.setUseTexture(false);
 
 #ifdef TARGET_ANDROID
-	ofxAndroidVideoGrabber * grabber = (ofxAndroidVideoGrabber*)((ofVideoGrabber*)video)->getGrabber();
+	ofxAndroidVideoGrabber * grabber = (ofxAndroidVideoGrabber*) video->getGrabber().get();
 	ofAddListener(grabber->newFrameE,this,&Detector::newFrame);
 #elif defined (TARGET_LINUX)
-	ofGstVideoGrabber * grabber =(ofGstVideoGrabber*) ((ofVideoGrabber*)video)->getGrabber();
+	ofGstVideoGrabber * grabber = (ofGstVideoGrabber*) video->getGrabber().get();
 	ofGstVideoUtils * videoUtils = grabber->getGstVideoUtils();
 	ofAddListener(videoUtils->bufferEvent,this,&Detector::newFrame);
 #endif
@@ -57,7 +82,8 @@ void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoin
 
 	trainOnly = false;
 	state = Initializing;
-	startThread(true,false);
+	if(!lock) startThread(true,false);
+	else init();
 }
 
 void Detector::setupTrainOnly(string _model){
@@ -78,7 +104,7 @@ void Detector::setupTrainOnly(string _model){
 }
 
 void Detector::newFrame(ofPixels & pixels){
-	if(state!=Running) return;
+	if(state!=Running || !pixels.getPixels()) return;
 	if(pixels.getImageType()==OF_IMAGE_COLOR){
 		colorImg = pixels.getPixels();
 		img = colorImg;
@@ -104,11 +130,15 @@ void Detector::newFrame(ofPixels & pixels){
 	}
 }
 
-void Detector::threadedFunction(){
+void Detector::init(){
 	fern.initTracker(model,width,height);
 	if(trainOnly) state=Finished;
 	else state = Running;
 	fps_time = ofGetElapsedTimeMillis();
+}
+
+void Detector::threadedFunction(){
+	init();
 	stopThread();
 	/*while(isThreadRunning()){
 		while(!isNewFrame) ofSleepMillis(10);
