@@ -12,6 +12,8 @@ Geo::Geo()
 :imageChanged(false)
 ,zoom(15)
 ,init(true)
+,width(320)
+,height(240)
 {
 	image.setUseTexture(false);
 	texImage.loadImage("geo/blank.png");
@@ -25,15 +27,19 @@ Geo::~Geo() {
 
 
 void Geo::start(){
+#ifdef TARGET_ANDROID
 	ofAddListener(ofxAndroidGPS::locationChangedE,this,&Geo::locationChanged);
 	ofxAndroidGPS::startGPS();
+#endif
 	queryMap();
 	queryAddress();
 }
 
 void Geo::stop(){
+#ifdef TARGET_ANDROID
 	ofxAndroidGPS::stopGPS();
 	ofRemoveListener(ofxAndroidGPS::locationChangedE,this,&Geo::locationChanged);
+#endif
 	image.clear();
 	image.setUseTexture(false);
 	image.loadImage("geo/blank.png");
@@ -56,6 +62,17 @@ void Geo::setLocation(ofxLocation & location){
 string Geo::getAddress(){
 	Poco::ScopedLock<ofMutex> slock(mutex);
 	return currentAddress;
+}
+
+string Geo::getCountry(){
+	Poco::ScopedLock<ofMutex> slock(mutex);
+	return currentCountry;
+
+}
+
+string Geo::getCity(){
+	Poco::ScopedLock<ofMutex> slock(mutex);
+	return currentCity;
 }
 
 ofxLocation Geo::getLocation(){
@@ -89,7 +106,9 @@ void Geo::urlResponse(ofHttpResponse & response){
 		string country = xml.getValue("reversegeocode:addressparts:country","");
 
 		mutex.lock();
-		currentAddress = road + ", " + city + " (" + country +")";
+		currentAddress = road;
+		currentCity = city;
+		currentCountry = country;
 		mutex.unlock();
 		bQueryAddress = false;
 	}
@@ -101,7 +120,7 @@ void Geo::queryAddress(){
 }
 
 void Geo::queryMap(){
-	ofLoadURLAsync("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width=320&height=240&points="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+",pointImagePattern:greenP","ofxGeo.Map");
+	ofLoadURLAsync("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width="+ofToString(width)+"&height="+ofToString(height)+"&points="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+",pointImagePattern:greenP","ofxGeo.Map");
 	bQueryMap = true;
 }
 
@@ -138,7 +157,7 @@ void Geo::drawLastLocationImage(float x, float y){
 		texImage.draw(x,y);
 	}
 	if(!texImage.bAllocated() || bQueryMap){
-		circularPB.setPosition(ofPoint(x+320*0.5,y+240*0.5));
+		circularPB.setPosition(ofPoint(x+width*0.5,y+height*0.5));
 		circularPB.draw();
 	}
 }
@@ -182,17 +201,24 @@ void Geo::draw(float x,float y,float w, float h){
 }
 
 float Geo::getHeight(){
-	return 240;
+	return height;
 }
 
 float Geo::getWidth(){
-	return 320;
+	return width;
+}
+
+void Geo::setSize(float _width, float _height){
+	width = _width;
+	height = _height;
 }
 
 ofBuffer Geo::getImageFor(const ofxLocation & location){
-	return ofLoadURL("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width=320&height=240&points="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+",pointImagePattern:greenP").data;
+	return ofLoadURL("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(location.longitude)+","+ofToString(location.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width="+ofToString(width)+"&height="+ofToString(height)+"&points="+ofToString(location.longitude)+","+ofToString(location.latitude)+",pointImagePattern:greenP").data;
 }
 
-string Geo::getAddressFor(const ofxLocation & location){
-	return ofLoadURL("http://nominatim.openstreetmap.org/reverse?lat="+ofToString(lastLocation.latitude) + "&lon=" +ofToString(lastLocation.longitude)+"&zoom=0").data;
+ofxXmlSettings Geo::getAddressFor(const ofxLocation & location){
+	ofxXmlSettings xml;
+	xml.loadFromBuffer(ofLoadURL("http://nominatim.openstreetmap.org/reverse?lat="+ofToString(location.latitude) + "&lon=" +ofToString(location.longitude)+"&zoom=0").data.getText());
+	return xml;
 }

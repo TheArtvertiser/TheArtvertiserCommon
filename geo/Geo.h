@@ -25,6 +25,8 @@ public:
 	void setLocation(ofxLocation & location);
 
 	string getAddress();
+	string getCountry();
+	string getCity();
 	ofxLocation getLocation();
 	ofPixels getLastLocationPixels();
 
@@ -42,7 +44,7 @@ public:
 	void urlResponse(ofHttpResponse & response);
 
 	ofBuffer getImageFor(const ofxLocation & location);
-	string getAddressFor(const ofxLocation & location);
+	ofxXmlSettings getAddressFor(const ofxLocation & location);
 
 
 	// from ofBaseDraws
@@ -51,6 +53,8 @@ public:
 
 	float getHeight();
 	float getWidth();
+
+	void setSize(float width, float height);
 
 private:
 	void locationChanged(ofxLocation & location);
@@ -61,6 +65,8 @@ private:
 	ofxLocation lastLocation;
 	ofxLocation prevLocation;
 	string currentAddress;
+	string currentCity;
+	string currentCountry;
 	ofxXmlSettings xml;
 	ofMutex mutex;
 	ofImage image;
@@ -70,6 +76,8 @@ private:
 	bool init;
 	gui::CircularPB circularPB;
 	bool bQueryMap, bQueryAddress;
+
+	float width,height;
 };
 
 #endif /* GEO_H_ */
