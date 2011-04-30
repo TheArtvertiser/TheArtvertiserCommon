@@ -11,6 +11,7 @@
 #include "ofConstants.h"
 #include "ofFileUtils.h"
 #include "ofPoint.h"
+#include "Geo.h"
 
 #define DEFAULT_ARTVERT_FOLDER "adverts/"
 
@@ -35,14 +36,19 @@ public:
 	ofFile & getROIFile();
 	ofFile & getDetectorData();
 	ofFile & getTrackerData();
+	ofFile & getLocationFile();
 
 	const ofFile & getCompressedImage() const;
 	const ofFile & getModel() const;
 	const ofFile & getROIFile() const;
 	const ofFile & getDetectorData() const;
 	const ofFile & getTrackerData() const;
+	const ofFile & getLocationFile() const;
+
+	vector<ofFile> getArtverts();
 
 	vector<ofPoint> getROI();
+	ofxLocation getLocation();
 
 	void save();
 
@@ -65,6 +71,7 @@ private:
 	ofFile roiFile;
 	ofFile detectorData;
 	ofFile trackerData;
+	ofFile locationData;
 	vector<ofPoint> roi;
 };
 

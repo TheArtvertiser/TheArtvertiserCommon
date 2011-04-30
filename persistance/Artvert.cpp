@@ -23,6 +23,7 @@ Artvert::Artvert(string uid,string folder)
 ,roiFile(folder + uid+".bmp.roi")
 ,detectorData(folder + uid+".bmp.detector_data")
 ,trackerData(folder + uid+".bmp.tracker_data")
+,locationData(folder + uid+".bmp.location")
 ,roi(4)
 {
 	if(roiFile.exists()){
@@ -62,6 +63,7 @@ void Artvert::setUID(const string & _uid){
 	}
 	detectorData.open(folder + uid+".bmp.detector_data");
 	trackerData.open(folder + uid+".bmp.tracker_data");
+	locationData.open(folder + uid+".bmp.location");
 
 	ofxXmlSettings & xml = PersistanceEngine::artverts();
 	int numAlias = xml.getNumTags("artvert");
@@ -121,6 +123,26 @@ ofFile & Artvert::getTrackerData(){
 	return trackerData;
 }
 
+ofFile & Artvert::getLocationFile(){
+	return locationData;
+}
+
+const ofFile & Artvert::getLocationFile() const{
+	return locationData;
+}
+
+ofxLocation Artvert::getLocation(){
+	ofxLocation location = {0,0,0,0,0};
+	if(locationData.exists()){
+		locationData >> location;
+		locationData.seekg(0,ios_base::beg);
+	}else{
+		ofLog(OF_LOG_ERROR,"Artvert: error trying to open location file " + locationData.getAbsolutePath());
+	}
+
+	return location;
+}
+
 const ofFile & Artvert::getCompressedImage() const{
 	return compressedImage;
 }
@@ -154,6 +176,24 @@ vector<ofPoint> Artvert::getROI(){
 
 	return vector<ofPoint>(4);
 
+}
+
+vector<ofFile> Artvert::getArtverts(){
+	ofDirectory default_artverts_dir("artverts/");
+	default_artverts_dir.allowExt("jpg");
+	default_artverts_dir.allowExt("png");
+	default_artverts_dir.allowExt("bmp");
+	default_artverts_dir.listDir();
+	vector<ofFile> artverts = default_artverts_dir.getFiles();
+
+	ofDirectory artverts_dir("artverts/" + getUID());
+	artverts_dir.allowExt("jpg");
+	artverts_dir.allowExt("png");
+	artverts_dir.listDir();
+	vector<ofFile> own_artverts = artverts_dir.getFiles();
+	artverts.insert(artverts.end(),own_artverts.begin(),own_artverts.end());
+
+	return artverts;
 }
 
 void Artvert::save(){
