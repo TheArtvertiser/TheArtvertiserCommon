@@ -7,7 +7,9 @@
 
 #include "Detector.h"
 #include "homography.h"
+#ifdef TARGET_ANDROID
 #include "ofxAndroidVideoGrabber.h"
+#endif
 
 Detector::Detector() {
 	state = Init;
