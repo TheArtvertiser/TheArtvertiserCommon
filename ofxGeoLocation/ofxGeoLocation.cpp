@@ -5,10 +5,13 @@
  *      Author: arturo
  */
 
-#include "Geo.h"
+#include "ofxGeoLocation.h"
 #include "Poco/ScopedLock.h"
+#ifdef TARGET_ANDROID
+#include "ofxAndroidGPS.h"
+#endif
 
-Geo::Geo()
+ofxGeoLocation::ofxGeoLocation()
 :imageChanged(false)
 ,zoom(15)
 ,init(true)
@@ -21,24 +24,24 @@ Geo::Geo()
 	ofRegisterURLNotification(this);
 }
 
-Geo::~Geo() {
+ofxGeoLocation::~ofxGeoLocation() {
 
 }
 
 
-void Geo::start(){
+void ofxGeoLocation::start(){
 #ifdef TARGET_ANDROID
-	ofAddListener(ofxAndroidGPS::locationChangedE,this,&Geo::locationChanged);
+	ofAddListener(ofxAndroidGPS::locationChangedE,this,&ofxGeoLocation::locationChanged);
 	ofxAndroidGPS::startGPS();
 #endif
 	queryMap();
 	queryAddress();
 }
 
-void Geo::stop(){
+void ofxGeoLocation::stop(){
 #ifdef TARGET_ANDROID
 	ofxAndroidGPS::stopGPS();
-	ofRemoveListener(ofxAndroidGPS::locationChangedE,this,&Geo::locationChanged);
+	ofRemoveListener(ofxAndroidGPS::locationChangedE,this,&ofxGeoLocation::locationChanged);
 #endif
 	image.clear();
 	image.setUseTexture(false);
@@ -47,10 +50,12 @@ void Geo::stop(){
 	ofRemoveAllURLRequests();
 }
 
-void Geo::setLocation(ofxLocation & location){
+void ofxGeoLocation::setLocation(ofxLocation & location){
 	Poco::ScopedLock<ofMutex> slock(mutex);
 	lastLocation = prevLocation = location;
 	currentAddress = "";
+	currentCity = "";
+	currentCountry = "";
 	image.clear();
 	image.setUseTexture(false);
 	image.loadImage("geo/blank.png");
@@ -59,32 +64,32 @@ void Geo::setLocation(ofxLocation & location){
 	queryMap();
 }
 
-string Geo::getAddress(){
+string ofxGeoLocation::getAddress(){
 	Poco::ScopedLock<ofMutex> slock(mutex);
 	return currentAddress;
 }
 
-string Geo::getCountry(){
+string ofxGeoLocation::getCountry(){
 	Poco::ScopedLock<ofMutex> slock(mutex);
 	return currentCountry;
 
 }
 
-string Geo::getCity(){
+string ofxGeoLocation::getCity(){
 	Poco::ScopedLock<ofMutex> slock(mutex);
 	return currentCity;
 }
 
-ofxLocation Geo::getLocation(){
+ofxLocation ofxGeoLocation::getLocation(){
 	return lastLocation;
 }
 
-ofPixels Geo::getLastLocationPixels(){
+ofPixels ofxGeoLocation::getLastLocationPixels(){
 	Poco::ScopedLock<ofMutex> slock(mutex);
 	return image.getPixelsRef();
 }
 
-void Geo::urlResponse(ofHttpResponse & response){
+void ofxGeoLocation::urlResponse(ofHttpResponse & response){
 	if(response.request.name=="ofxGeo.Map"){
 		if(response.status==200){
 			ofLog(OF_LOG_VERBOSE, "got map");
@@ -114,18 +119,18 @@ void Geo::urlResponse(ofHttpResponse & response){
 	}
 }
 
-void Geo::queryAddress(){
+void ofxGeoLocation::queryAddress(){
 	ofLoadURLAsync("http://nominatim.openstreetmap.org/reverse?lat="+ofToString(lastLocation.latitude) + "&lon=" +ofToString(lastLocation.longitude)+"&zoom=0","ofxGeo.Address");
 	bQueryAddress = true;
 }
 
-void Geo::queryMap(){
+void ofxGeoLocation::queryMap(){
 	ofLoadURLAsync("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width="+ofToString(width)+"&height="+ofToString(height)+"&points="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+",pointImagePattern:greenP","ofxGeo.Map");
 	bQueryMap = true;
 }
 
 
-void Geo::locationChanged(ofxLocation & _location){
+void ofxGeoLocation::locationChanged(ofxLocation & _location){
 	lastLocation = _location;
 	if(init || distance(lastLocation,prevLocation)>0.01){
 		init = false;
@@ -135,7 +140,7 @@ void Geo::locationChanged(ofxLocation & _location){
 	}
 }
 
-void Geo::update(){
+void ofxGeoLocation::update(){
 	mutex.lock();
 	if(imageChanged){
 		texImage = image;
@@ -152,9 +157,9 @@ void Geo::update(){
 	}
 }
 
-void Geo::drawLastLocationImage(float x, float y){
+void ofxGeoLocation::drawLastLocationImage(float x, float y){
 	if(texImage.bAllocated()){
-		texImage.draw(x,y);
+		texImage.draw(x,y,width,height);
 	}
 	if(!texImage.bAllocated() || bQueryMap){
 		circularPB.setPosition(ofPoint(x+width*0.5,y+height*0.5));
@@ -162,62 +167,62 @@ void Geo::drawLastLocationImage(float x, float y){
 	}
 }
 
-void Geo::setZoom(int _zoom){
+void ofxGeoLocation::setZoom(int _zoom){
 	zoom = _zoom;
 	queryMap();
 }
 
-int Geo::getZoom(){
+int ofxGeoLocation::getZoom(){
 	return zoom;
 }
 
-void Geo::increaseZoom(){
+void ofxGeoLocation::increaseZoom(){
 	zoom++;
 	queryMap();
 }
 
-void Geo::decreaseZoom(){
+void ofxGeoLocation::decreaseZoom(){
 	zoom--;
 	queryMap();
 }
 
 
-double Geo::distance(double lon1, double lat1, double lon2, double lat2){
+double ofxGeoLocation::distance(double lon1, double lat1, double lon2, double lat2){
 	// http://www.movable-type.co.uk/scripts/latlong.html
 	static double R = 6371; // earth radius in km
 	return acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2) * cos(lon2-lon1)) * R;
 }
 
-double Geo::distance(const ofxLocation & loc1, const ofxLocation & loc2){
+double ofxGeoLocation::distance(const ofxLocation & loc1, const ofxLocation & loc2){
 	return distance(loc1.longitude, loc1.latitude, loc2.longitude, loc2.latitude);
 }
 
 
-void Geo::draw(float x,float y){
+void ofxGeoLocation::draw(float x,float y){
 	drawLastLocationImage(x,y);
 }
-void Geo::draw(float x,float y,float w, float h){
+void ofxGeoLocation::draw(float x,float y,float w, float h){
 	drawLastLocationImage(x,y);
 }
 
-float Geo::getHeight(){
+float ofxGeoLocation::getHeight(){
 	return height;
 }
 
-float Geo::getWidth(){
+float ofxGeoLocation::getWidth(){
 	return width;
 }
 
-void Geo::setSize(float _width, float _height){
+void ofxGeoLocation::setSize(float _width, float _height){
 	width = _width;
 	height = _height;
 }
 
-ofBuffer Geo::getImageFor(const ofxLocation & location){
+ofBuffer ofxGeoLocation::getImageFor(const ofxLocation & location){
 	return ofLoadURL("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(location.longitude)+","+ofToString(location.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width="+ofToString(width)+"&height="+ofToString(height)+"&points="+ofToString(location.longitude)+","+ofToString(location.latitude)+",pointImagePattern:greenP").data;
 }
 
-ofxXmlSettings Geo::getAddressFor(const ofxLocation & location){
+ofxXmlSettings ofxGeoLocation::getAddressFor(const ofxLocation & location){
 	ofxXmlSettings xml;
 	xml.loadFromBuffer(ofLoadURL("http://nominatim.openstreetmap.org/reverse?lat="+ofToString(location.latitude) + "&lon=" +ofToString(location.longitude)+"&zoom=0").data.getText());
 	return xml;

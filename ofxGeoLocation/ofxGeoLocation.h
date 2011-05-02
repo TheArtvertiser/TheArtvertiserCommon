@@ -9,15 +9,15 @@
 #define GEO_H_
 
 #include "ofConstants.h"
-#include "ofxAndroidGPS.h"
+#include "ofxGPS.h"
 #include "ofxXmlSettings.h"
 #include "CircularPB.h"
 #include "ofBaseTypes.h"
 
-class Geo: public ofBaseDraws{
+class ofxGeoLocation: public ofBaseDraws{
 public:
-	Geo();
-	~Geo();
+	ofxGeoLocation();
+	~ofxGeoLocation();
 
 	void start();
 	void stop();
