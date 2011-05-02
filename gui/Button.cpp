@@ -17,6 +17,15 @@ Button::Button(const ofRectangle & rect)
 
 }
 
+Button::Button(const string & text,const ofColor & color)
+:label(text,color)
+,rect(label.getRect())
+,state(Enabled)
+,refreshIcon(false)
+{
+
+}
+
 void Button::enableEvents(){
 	ofRegisterMouseEvents(this);
 }
@@ -35,6 +44,7 @@ void Button::update(){
 		pressedIcon.reloadTexture();
 		refreshIcon = false;
 	}
+	label.update();
 }
 
 void Button::draw(){
@@ -69,6 +79,7 @@ void Button::draw(){
 		break;
 
 	}
+	label.draw();
 	ofPopStyle();
 }
 
@@ -132,6 +143,7 @@ void Button::updateState(Transition transition){
 
 void Button::setRect(const ofRectangle & _rect){
 	rect = _rect;
+	label.setRect(rect);
 }
 
 ofRectangle Button::getRect(){
@@ -141,6 +153,8 @@ ofRectangle Button::getRect(){
 float Button::getAspectRatio(){
 	if(icon.bAllocated()){
 		return icon.getWidth()/icon.getHeight();
+	}else if(label.getText()!=""){
+		return label.getAspectRatio();
 	}else{
 		return 1;
 	}
@@ -163,9 +177,19 @@ void Button::setPressedIcon(ofImage & icon){
 	refreshIcon = true;
 }
 
+void Button::setText(const string & text){
+	label.setText(text);
+	rect = label.getRect();
+}
+
+string Button::getText(){
+	return label.getText();
+}
+
 void Button::setPosition(const ofPoint & pos){
 	rect.x = pos.x;
 	rect.y = pos.y;
+	label.setPosition(pos);
 }
 
 Button::State Button::getState(){

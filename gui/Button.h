@@ -13,11 +13,14 @@
 #include "ofPoint.h"
 #include "ofImage.h"
 #include "Widget.h"
+#include "Label.h"
+#include "ofColor.h"
 
 namespace gui{
 class Button: public Widget {
 public:
 	Button( const ofRectangle & rect=ofRectangle() );
+	Button( const string & text,const ofColor & color=ofColor(0,0,0) );
 	~Button(){ disableEvents(); }
 
 	void setRect(const ofRectangle & rect);
@@ -25,8 +28,11 @@ public:
 	void setPosition(const ofPoint & pos);
 
 	void setIcon(ofImage & icon);
+	void setText(const string & text);
 	void setFocusedIcon(ofImage & icon);
 	void setPressedIcon(ofImage & icon);
+
+	string getText();
 
 	float getAspectRatio();
 
@@ -62,6 +68,7 @@ private:
 
 	void updateState(Transition transition);
 
+	Label label;
 	ofImage icon, focusedIcon, pressedIcon;
 	ofRectangle rect;
 	State state;
