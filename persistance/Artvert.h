@@ -11,7 +11,7 @@
 #include "ofConstants.h"
 #include "ofFileUtils.h"
 #include "ofPoint.h"
-#include "Geo.h"
+#include "ofxGeoLocation.h"
 
 #define DEFAULT_ARTVERT_FOLDER "adverts/"
 
