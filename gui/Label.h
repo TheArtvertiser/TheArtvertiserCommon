@@ -10,6 +10,8 @@
 
 #include "ofRectangle.h"
 #include "ofPoint.h"
+#include "ofColor.h"
+//#include "ofTrueTypeFont.h"
 
 #include "Widget.h"
 
@@ -18,7 +20,7 @@ namespace gui{
 
 class Label: public Widget {
 public:
-	Label();
+	Label(const string & text="",const ofColor & color=ofColor(0,0,0));
 	~Label();
 
 	void setPosition(const ofPoint & pos);
@@ -33,10 +35,24 @@ public:
 	void disableEvents();
 
 	void setText(const string & text);
+	string getText();
+
+	void setColor(const ofColor & color);
+	ofColor getColor();
+
+	static void setDefaultFont(string fontPath,float size);
+	void setFont(string fontPath,float size);
 
 private:
+	void drawString(string text, float x, float y);
+	ofRectangle getStringBoundingBox(string text, float x, float y);
+
 	ofPoint position;
 	string text;
+	ofColor color;
+
+	/*static ofTrueTypeFont defaultTTF;
+	ofTrueTypeFont ttf;*/
 };
 
 }

@@ -10,9 +10,11 @@
 
 namespace gui{
 
-Label::Label() {
-	// TODO Auto-generated constructor stub
+//ofTrueTypeFont Label::defaultTTF;
 
+Label::Label(const string & text,const ofColor & color) {
+	setText(text);
+	setColor(color);
 }
 
 Label::~Label() {
@@ -29,7 +31,7 @@ void Label::setRect(const ofRectangle & rect){
 }
 
 ofRectangle Label::getRect(){
-	return ofRectangle(position.x,position.y,text.size()*10,10);
+	return getStringBoundingBox(text,position.x,position.y);
 }
 
 float Label::getAspectRatio(){
@@ -42,8 +44,8 @@ void Label::update(){
 
 void Label::draw(){
 	ofPushStyle();
-	ofSetColor(0,0,0);
-	ofDrawBitmapString(text,position.x,position.y+10);
+	ofSetColor(color);
+	drawString(text,position.x,position.y+getRect().height);
 	ofPopStyle();
 }
 
@@ -57,6 +59,46 @@ void Label::disableEvents(){
 
 void Label::setText(const string & _text){
 	text = _text;
+}
+
+string Label::getText(){
+	return text;
+}
+
+void Label::setColor(const ofColor & _color){
+	color = _color;
+}
+
+ofColor Label::getColor(){
+	return color;
+}
+
+void Label::setDefaultFont(string fontPath,float size){
+	//defaultTTF.loadFont(fontPath,size,true,true);
+}
+
+void Label::setFont(string fontPath,float size){
+	//ttf.loadFont(fontPath,size,true,true);
+}
+
+void Label::drawString(string text, float x, float y){
+	/*if(ttf.bLoadedOk){
+		ttf.drawString(text,x,y);
+	}else if(defaultTTF.bLoadedOk){
+		defaultTTF.drawString(text,x,y);
+	}else{*/
+		ofDrawBitmapString(text,x,y);
+	//}
+}
+
+ofRectangle Label::getStringBoundingBox(string text, float x, float y){
+	/*if(ttf.bLoadedOk){
+		return ttf.getStringBoundingBox(text,x,y);
+	}else if(defaultTTF.bLoadedOk){
+		return defaultTTF.getStringBoundingBox(text,x,y);
+	}else{*/
+		return ofRectangle(x,y,text.size()*10,10);
+	//}
 }
 
 }
