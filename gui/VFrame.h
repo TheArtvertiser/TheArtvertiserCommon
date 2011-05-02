@@ -23,6 +23,7 @@ public:
 	void setVSpacing(float vSpacing);
 	void repositionWidgets();
 	void setLeftMargin(float margin);
+	void setElementHeight(float height);
 
 private:
 
@@ -30,6 +31,7 @@ private:
 	float width;
 	float vSpacing;
 	float leftMargin;
+	float elementHeight;
 
 };
 }

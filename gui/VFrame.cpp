@@ -14,6 +14,7 @@ VFrame::VFrame()
 :width(0)
 ,vSpacing(0)
 ,leftMargin(0)
+,elementHeight(0)
 {
 
 }
@@ -38,6 +39,10 @@ void VFrame::setLeftMargin(float margin){
 	leftMargin = margin;
 }
 
+void VFrame::setElementHeight(float height){
+	elementHeight = height;
+}
+
 void VFrame::repositionWidgets(){
 	ofPoint nextPos(pos);
 	nextPos.x += leftMargin;
@@ -45,8 +50,14 @@ void VFrame::repositionWidgets(){
 	for(int i=0;i<(int)widgets.size();i++){
 		Widget * widget = widgets[i].get();
 		float ratio = widget->getAspectRatio();
-		float height = width/ratio;
-		widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,height));
+
+		if(elementHeight>0 && elementHeight*ratio<width){
+			float width = elementHeight*ratio;
+			widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,elementHeight));
+		}else{
+			float height = width/ratio;
+			widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,height));
+		}
 
 		nextPos.y += widget->getRect().height + vSpacing;
 	}
