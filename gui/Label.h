@@ -11,7 +11,7 @@
 #include "ofRectangle.h"
 #include "ofPoint.h"
 #include "ofColor.h"
-//#include "ofTrueTypeFont.h"
+#include "ofTrueTypeFont.h"
 
 #include "Widget.h"
 
@@ -40,7 +40,6 @@ public:
 	void setColor(const ofColor & color);
 	ofColor getColor();
 
-	static void setDefaultFont(string fontPath,float size);
 	void setFont(string fontPath,float size);
 
 private:
@@ -51,8 +50,7 @@ private:
 	string text;
 	ofColor color;
 
-	/*static ofTrueTypeFont defaultTTF;
-	ofTrueTypeFont ttf;*/
+	ofTrueTypeFont ttf;
 };
 
 }

@@ -10,8 +10,6 @@
 
 namespace gui{
 
-//ofTrueTypeFont Label::defaultTTF;
-
 Label::Label(const string & text,const ofColor & color) {
 	setText(text);
 	setColor(color);
@@ -73,32 +71,24 @@ ofColor Label::getColor(){
 	return color;
 }
 
-void Label::setDefaultFont(string fontPath,float size){
-	//defaultTTF.loadFont(fontPath,size,true,true);
-}
-
 void Label::setFont(string fontPath,float size){
-	//ttf.loadFont(fontPath,size,true,true);
+	ttf.loadFont(fontPath,size,true,true);
 }
 
 void Label::drawString(string text, float x, float y){
-	/*if(ttf.bLoadedOk){
+	if(ttf.bLoadedOk){
 		ttf.drawString(text,x,y);
-	}else if(defaultTTF.bLoadedOk){
-		defaultTTF.drawString(text,x,y);
-	}else{*/
+	}else{
 		ofDrawBitmapString(text,x,y);
-	//}
+	}
 }
 
 ofRectangle Label::getStringBoundingBox(string text, float x, float y){
-	/*if(ttf.bLoadedOk){
+	if(ttf.bLoadedOk){
 		return ttf.getStringBoundingBox(text,x,y);
-	}else if(defaultTTF.bLoadedOk){
-		return defaultTTF.getStringBoundingBox(text,x,y);
-	}else{*/
+	}else{
 		return ofRectangle(x,y,text.size()*10,10);
-	//}
+	}
 }
 
 }
