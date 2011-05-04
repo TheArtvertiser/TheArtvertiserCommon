@@ -120,12 +120,12 @@ void ofxGeoLocation::urlResponse(ofHttpResponse & response){
 }
 
 void ofxGeoLocation::queryAddress(){
-	ofLoadURLAsync("http://nominatim.openstreetmap.org/reverse?lat="+ofToString(lastLocation.latitude) + "&lon=" +ofToString(lastLocation.longitude)+"&zoom=0","ofxGeo.Address");
+	urlLoader.getAsync("http://nominatim.openstreetmap.org/reverse?lat="+ofToString(lastLocation.latitude) + "&lon=" +ofToString(lastLocation.longitude)+"&zoom=0","ofxGeo.Address");
 	bQueryAddress = true;
 }
 
 void ofxGeoLocation::queryMap(){
-	ofLoadURLAsync("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width="+ofToString(width)+"&height="+ofToString(height)+"&points="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+",pointImagePattern:greenP","ofxGeo.Map");
+	urlLoader.getAsync("http://pafciu17.dev.openstreetmap.org/?module=map&center="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+"&zoom="+ofToString(zoom)+"&type=mapnik&width="+ofToString(width)+"&height="+ofToString(height)+"&points="+ofToString(lastLocation.longitude)+","+ofToString(lastLocation.latitude)+",pointImagePattern:greenP","ofxGeo.Map");
 	bQueryMap = true;
 }
 

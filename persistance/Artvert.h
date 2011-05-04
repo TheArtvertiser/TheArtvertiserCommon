@@ -12,6 +12,7 @@
 #include "ofFileUtils.h"
 #include "ofPoint.h"
 #include "ofxGeoLocation.h"
+#include "ofxMD5.h"
 
 #define DEFAULT_ARTVERT_FOLDER "adverts/"
 
@@ -31,26 +32,30 @@ public:
 
 	bool isReady();
 
-	ofFile & getCompressedImage();
-	ofFile & getModel();
-	ofFile & getROIFile();
-	ofFile & getDetectorData();
-	ofFile & getTrackerData();
-	ofFile & getLocationFile();
-
-	const ofFile & getCompressedImage() const;
-	const ofFile & getModel() const;
-	const ofFile & getROIFile() const;
-	const ofFile & getDetectorData() const;
-	const ofFile & getTrackerData() const;
-	const ofFile & getLocationFile() const;
+	ofFile getCompressedImage() const;
+	ofFile getModel() const;
+	ofFile getROIFile() const;
+	ofFile getDetectorData() const;
+	ofFile getTrackerData() const;
+	ofFile getLocationFile() const;
+	ofFile getMD5File() const;
 
 	vector<ofFile> getArtverts();
 
 	vector<ofPoint> getROI();
 	ofxLocation getLocation();
 
+	bool checkIntegrity();
+	string getStoredMD5();
+	string generateMD5();
+
+
+
+	void remove();
+	void removeAnalisys();
+
 	void save();
+
 
 	static vector<Artvert> listAll(string folder=DEFAULT_ARTVERT_FOLDER);
 
@@ -72,6 +77,7 @@ private:
 	ofFile detectorData;
 	ofFile trackerData;
 	ofFile locationData;
+	ofFile md5File;
 	vector<ofPoint> roi;
 };
 

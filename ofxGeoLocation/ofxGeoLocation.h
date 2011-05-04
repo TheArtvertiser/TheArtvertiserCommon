@@ -78,6 +78,8 @@ private:
 	bool bQueryMap, bQueryAddress;
 
 	float width,height;
+
+	ofURLFileLoader urlLoader;
 };
 
 #endif /* GEO_H_ */

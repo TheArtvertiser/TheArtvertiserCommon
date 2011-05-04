@@ -9,7 +9,7 @@ struct ofxLocation{
 };
 
 
-inline ostream & operator <<(ostream & ostr, ofxLocation & location){
+inline ostream & operator <<(ostream & ostr, const ofxLocation & location){
 	ostr << location.altitude << " " << location.latitude << " " << location.longitude << " " << location.bearing << " " << location.speed;
 	return ostr;
 }
