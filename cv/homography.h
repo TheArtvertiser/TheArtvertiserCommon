@@ -9,7 +9,7 @@
 #define HOMOGRAPHY_H_
 
 #include "ofxOpenCv.h"
-#include "ofxVectorMath.h"
+#include "ofVectorMath.h"
 
 inline void gaussian_elimination(float *input, int n){
 	// ported to c from pseudocode in
@@ -112,8 +112,8 @@ inline void findHomography(ofPoint src[4], ofPoint dst[4], float homography[16])
 	for(int i=0;i<16;i++) homography[i] = aux_H[i];
 }
 
-inline ofxMatrix4x4 findHomography(ofPoint src[4], ofPoint dst[4]){
-	ofxMatrix4x4 matrix;
+inline ofMatrix4x4 findHomography(ofPoint src[4], ofPoint dst[4]){
+	ofMatrix4x4 matrix;
 
 	// create the equation system to be solved
 	//
