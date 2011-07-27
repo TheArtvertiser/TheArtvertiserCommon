@@ -25,6 +25,8 @@ public:
 	void setLeftMargin(float margin);
 	void setElementHeight(float height);
 
+	void setKeepAspectRatio(bool keepAspectRatio);
+
 private:
 
 	ofPoint pos;
@@ -32,6 +34,7 @@ private:
 	float vSpacing;
 	float leftMargin;
 	float elementHeight;
+	bool keepAspectRatio;
 
 };
 }

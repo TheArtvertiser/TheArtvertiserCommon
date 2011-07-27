@@ -186,6 +186,10 @@ string Button::getText(){
 	return label.getText();
 }
 
+void Button::setFont(ofPtr<ofTrueTypeFont> font){
+	label.setFont(font);
+}
+
 void Button::setPosition(const ofPoint & pos){
 	rect.x = pos.x;
 	rect.y = pos.y;

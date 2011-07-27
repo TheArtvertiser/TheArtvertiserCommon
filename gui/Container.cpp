@@ -65,6 +65,10 @@ int Container::size(){
 	return widgets.size();
 }
 
+bool Container::empty(){
+	return widgets.empty();
+}
+
 void Container::clear(){
 	for(int i=0;i<(int)widgets.size();i++){
 		widgets[i]->disableEvents();

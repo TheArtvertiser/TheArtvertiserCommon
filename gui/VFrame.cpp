@@ -15,6 +15,7 @@ VFrame::VFrame()
 ,vSpacing(0)
 ,leftMargin(0)
 ,elementHeight(0)
+,keepAspectRatio(true)
 {
 
 }
@@ -49,18 +50,27 @@ void VFrame::repositionWidgets(){
 	nextPos.y += vSpacing;
 	for(int i=0;i<(int)widgets.size();i++){
 		Widget * widget = widgets[i].get();
-		float ratio = widget->getAspectRatio();
 
-		if(elementHeight>0 && elementHeight*ratio<width){
-			float width = elementHeight*ratio;
-			widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,elementHeight));
+		if(keepAspectRatio){
+			float ratio = widget->getAspectRatio();
+
+			if(elementHeight>0 && elementHeight*ratio<width){
+				float width = elementHeight*ratio;
+				widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,elementHeight));
+			}else{
+				float height = width/ratio;
+				widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,height));
+			}
 		}else{
-			float height = width/ratio;
-			widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,height));
+			widget->setRect(ofRectangle(nextPos.x,nextPos.y,width,elementHeight>0?elementHeight:widget->getRect().height));
 		}
 
 		nextPos.y += widget->getRect().height + vSpacing;
 	}
+}
+
+void VFrame::setKeepAspectRatio(bool _keepAspectRatio){
+	keepAspectRatio = _keepAspectRatio;
 }
 
 }

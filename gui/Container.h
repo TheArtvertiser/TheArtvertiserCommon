@@ -30,6 +30,7 @@ public:
 	void removeDrawable(ofPtr<ofBaseDraws> drawable);
 
 	int size();
+	bool empty();
 
 
 	void clear();

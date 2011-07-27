@@ -12,6 +12,7 @@
 #include <map>
 
 #include "ofImage.h"
+#include "ofTrueTypeFont.h"
 
 #include "ofxThreadedImageLoader.h"
 
@@ -25,12 +26,19 @@ public:
 	ofPtr<ofImage> getResource(string name);
 	void storeResource(ofPtr<ofImage> image, string name);
 
+	ofPtr<ofTrueTypeFont> getFont(string path,int size);
+
 private:
 	list<ofPtr<ofImage> > icons;
 	map<string,list<ofPtr<ofImage> >::iterator > icons_index;
+
 	list<ofPtr<ofImage> > resources;
 	map<string,list<ofPtr<ofImage> >::iterator > resources_index;
+
 	ofxThreadedImageLoader loader;
+
+	list<ofPtr<ofTrueTypeFont> > fonts;
+	map<string,list<ofPtr<ofTrueTypeFont> >::iterator > fonts_index;
 };
 }
 

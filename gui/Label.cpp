@@ -71,21 +71,21 @@ ofColor Label::getColor(){
 	return color;
 }
 
-void Label::setFont(string fontPath,float size){
-	ttf.loadFont(fontPath,size,true,true);
+void Label::setFont(ofPtr<ofTrueTypeFont> font){
+	ttf = font;
 }
 
 void Label::drawString(string text, float x, float y){
-	if(ttf.bLoadedOk){
-		ttf.drawString(text,x,y);
+	if(ttf && ttf->isLoaded()){
+		ttf->drawString(text,x,y);
 	}else{
 		ofDrawBitmapString(text,x,y);
 	}
 }
 
 ofRectangle Label::getStringBoundingBox(string text, float x, float y){
-	if(ttf.bLoadedOk){
-		return ttf.getStringBoundingBox(text,x,y);
+	if(ttf && ttf->isLoaded()){
+		return ttf->getStringBoundingBox(text,x,y);
 	}else{
 		return ofRectangle(x,y,text.size()*10,10);
 	}

@@ -12,6 +12,7 @@
 #include "ofPoint.h"
 #include "ofColor.h"
 #include "ofTrueTypeFont.h"
+#include "ofTypes.h"
 
 #include "Widget.h"
 
@@ -40,7 +41,7 @@ public:
 	void setColor(const ofColor & color);
 	ofColor getColor();
 
-	void setFont(string fontPath,float size);
+	void setFont(ofPtr<ofTrueTypeFont> font);
 
 private:
 	void drawString(string text, float x, float y);
@@ -50,7 +51,7 @@ private:
 	string text;
 	ofColor color;
 
-	ofTrueTypeFont ttf;
+	ofPtr<ofTrueTypeFont> ttf;
 };
 
 }

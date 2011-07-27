@@ -44,4 +44,17 @@ void IconCache::storeResource(ofPtr<ofImage> image,string filename){
 	icons_index[filename] = icons.end();
 	icons_index[filename]--;
 }
+
+ofPtr<ofTrueTypeFont> IconCache::getFont(string path,int size){
+	string fontidx = path + ofToString(size);
+	if(fonts_index.find(fontidx)==fonts_index.end()){
+		fonts.push_back(ofPtr<ofTrueTypeFont>(new ofTrueTypeFont()));
+		fonts_index[fontidx] = fonts.end();
+		fonts_index[fontidx]--;
+		fonts_index[fontidx]->get()->loadFont(path,size,true,true);
+	}
+
+	return *fonts_index[fontidx];
+}
+
 }

@@ -29,6 +29,7 @@ public:
 
 	void setIcon(ofImage & icon);
 	void setText(const string & text);
+	void setFont(ofPtr<ofTrueTypeFont> font);
 	void setFocusedIcon(ofImage & icon);
 	void setPressedIcon(ofImage & icon);
 
