@@ -40,7 +40,7 @@ inline istream & operator >>(istream & istr, ofxLocation & location){
 class ofxGeoLocation: public ofBaseDraws{
 public:
 	ofxGeoLocation();
-	~ofxGeoLocation();
+	virtual ~ofxGeoLocation();
 
 	void start();
 	void stop();
