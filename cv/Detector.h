@@ -35,6 +35,8 @@ public:
 		Running
 	};
 
+	void setSrcQuad(vector<ofPoint> srcQuad);
+
 	State getState(){return state;}
 	float getFps(){return fps;}
 	ofxFern fern;

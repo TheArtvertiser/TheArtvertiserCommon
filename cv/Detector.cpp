@@ -169,3 +169,7 @@ bool Detector::isTracked(){
 	return fern.state == ofxFern::Tracked;
 
 }
+
+void Detector::setSrcQuad(vector<ofPoint> _srcQuad){
+	srcQuad = _srcQuad;
+}
