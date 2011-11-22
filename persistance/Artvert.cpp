@@ -20,20 +20,20 @@ Artvert::Artvert(string uid,string folder)
 ,folder(ofFilePath::addTrailingSlash(folder))
 ,compressedImage(folder + uid+".jpg")
 ,model(folder + uid+".bmp")
-,roiFile(folder + uid+".bmp.roi")
+,roiPath(folder + uid+".bmp.roi")
 ,detectorData(folder + uid+".bmp.detector_data")
 ,trackerData(folder + uid+".bmp.tracker_data")
 ,locationData(folder + uid+".bmp.location")
-,md5File(folder + uid + ".bmp.md5")
+,md5Path(folder + uid + ".bmp.md5")
 //be careful when adding more files (update set also)
 ,roi(4)
 {
+	ofFile roiFile(roiPath);
 	if(roiFile.exists()){
 		roi.resize(4);
 		for(int i=0;i<4;i++){
 			roiFile >> roi[i].x >> roi[i].y;
 		}
-		roiFile.open(roiFile.path());
 	}
 
 	ofxXmlSettings & xml = PersistanceEngine::artverts();
@@ -53,20 +53,21 @@ string Artvert::getUID() const{
 
 void Artvert::setUID(const string & _uid){
 	uid = _uid;
-	compressedImage.open(folder + uid+".jpg");
-	model.open(folder + uid+".bmp");
-	roiFile.open(folder + uid+".bmp.roi");
+	compressedImage = folder + uid+".jpg";
+	model = folder + uid+".bmp";
+	roiPath = folder + uid+".bmp.roi";
+
+	ofFile roiFile(roiPath);
 	if(roiFile.exists()){
 		roi.resize(4);
 		for(int i=0;i<4;i++){
 			roiFile >> roi[i].x >> roi[i].y;
 		}
-		roiFile.seekg(0,ios_base::beg);
 	}
-	detectorData.open(folder + uid+".bmp.detector_data");
-	trackerData.open(folder + uid+".bmp.tracker_data");
-	locationData.open(folder + uid+".bmp.location");
-	md5File.open(folder + uid + ".bmp.md5");
+	detectorData = folder + uid+".bmp.detector_data";
+	trackerData = folder + uid+".bmp.tracker_data";
+	locationData = folder + uid+".bmp.location";
+	md5Path = folder + uid + ".bmp.md5";
 
 	ofxXmlSettings & xml = PersistanceEngine::artverts();
 	int numAlias = xml.getNumTags("artvert");
@@ -96,7 +97,11 @@ bool Artvert::hasAlias() const{
 }
 
 bool Artvert::isReady(){
-	bool ret = uid!="" && model.exists() && roiFile.exists() && detectorData.exists() && trackerData.exists();
+	bool ret = uid!="" && ofFile(model,ofFile::Reference).exists() &&
+			ofFile(roiPath,ofFile::Reference).exists() &&
+			ofFile(detectorData,ofFile::Reference).exists() &&
+			ofFile(trackerData,ofFile::Reference).exists();
+
 	if(ret){
 		return true;
 	}else if(hasAlias()){
@@ -107,53 +112,54 @@ bool Artvert::isReady(){
 }
 
 ofFile Artvert::getMD5File() const{
-	return md5File;
+	return ofFile(md5Path);
 }
 
 ofFile Artvert::getLocationFile() const{
-	return locationData;
+	return ofFile(locationData);
 }
 
 ofxLocation Artvert::getLocation(){
 	ofxLocation location = {0,0,0,0,0};
-	if(locationData.exists()){
-		locationData >> location;
-		locationData.seekg(0,ios_base::beg);
+	ofFile locationFile(locationData,ofFile::Reference);
+	if(locationFile.exists()){
+		locationFile >> location;
 	}else{
-		ofLog(OF_LOG_ERROR,"Artvert: error trying to open location file " + locationData.getAbsolutePath());
+		ofLog(OF_LOG_ERROR,"Artvert: error trying to open location file " + locationFile.getAbsolutePath());
 	}
 
 	return location;
 }
 
 ofFile Artvert::getCompressedImage() const{
-	return compressedImage;
+	return ofFile(compressedImage);
 }
 
 ofFile Artvert::getModel() const{
-	return model;
+	return ofFile(model);
 }
 
 ofFile Artvert::getROIFile() const{
-	return roiFile;
+	return ofFile(roiPath);
 }
 
 ofFile Artvert::getDetectorData() const{
-	return detectorData;
+	return ofFile(detectorData);
 }
 
 ofFile Artvert::getTrackerData() const{
-	return trackerData;
+	return ofFile(trackerData);
 }
 
 vector<ofPoint> Artvert::getROI(){
 	if(!roi.empty()) return roi;
 
+	ofFile roiFile(roiPath);
 	if(roiFile.exists()){
+		roi.resize(4);
 		for(int i=0;i<4;i++){
 			roiFile >> roi[i].x >> roi[i].y;
 		}
-		roiFile.seekg(0,ios_base::beg);
 		return roi;
 	}
 
@@ -238,9 +244,17 @@ bool Artvert::operator>=(const Artvert & artvert) const{
 }
 
 bool Artvert::checkIntegrity(){
-	if( !md5File.exists() || !compressedImage.exists() || !roiFile.exists() || !locationData.exists() ){
+	if( !ofFile(md5Path,ofFile::Reference).exists() ||
+			!ofFile(compressedImage,ofFile::Reference).exists() ||
+			!ofFile(roiPath,ofFile::Reference).exists() ||
+			!ofFile(locationData,ofFile::Reference).exists() ){
+
+		ofLogWarning("Artvert") << "basic files don't exist";
 		return false;
-	}else if(isReady() && (!detectorData.exists() || !trackerData.exists()) ){
+	}else if(isReady() &&
+				(!ofFile(detectorData,ofFile::Reference).exists() || !ofFile(trackerData,ofFile::Reference).exists()) ){
+
+		ofLogWarning("Artvert") << "detector files don't exist";
 		return false;
 	}else{
 		string storedmd5 = getStoredMD5();
@@ -252,9 +266,7 @@ bool Artvert::checkIntegrity(){
 
 string Artvert::getStoredMD5(){
 	string md5;
-	string path = md5File.path();
-	md5File.close();
-	md5File.open(path);
+	ofFile md5File(md5Path);
 	md5File >> md5;
 	return md5;
 }
@@ -265,19 +277,19 @@ string Artvert::generateMD5(){
 	vector<char> filesSum;
 	ofBuffer files;
 
-	compressedImage.open(compressedImage.path());
-	compressedImage >> files;
-	compressedImage.open(compressedImage.path());
+	ofFile compressedImageFile(compressedImage);
+	compressedImageFile >> files;
+	compressedImageFile.close();
 	filesSum.insert(filesSum.end(),files.getBinaryBuffer(), files.getBinaryBuffer()+files.size());
 
-	roiFile.open(roiFile.path());
+	ofFile roiFile(roiPath);
 	roiFile >> files;
-	roiFile.open(roiFile.path());
+	roiFile.close();
 	filesSum.insert(filesSum.end(),files.getBinaryBuffer(), files.getBinaryBuffer()+files.size());
 
-	locationData.open(locationData.path());
-	locationData >> files;
-	locationData.open(locationData.path());
+	ofFile locationFile(locationData);
+	locationFile >> files;
+	locationFile.close();
 	filesSum.insert(filesSum.end(),files.getBinaryBuffer(), files.getBinaryBuffer()+files.size());
 
 	if(!isReady()){
@@ -285,14 +297,13 @@ string Artvert::generateMD5(){
 		return testmd5;
 	}
 
-	detectorData.open(detectorData.path());
-	detectorData >> files;
-	detectorData.open(detectorData.path());
+	ofFile detectorFile(detectorData);
+	detectorFile >> files;
+	detectorFile.close();
 	filesSum.insert(filesSum.end(),files.getBinaryBuffer(), files.getBinaryBuffer()+files.size());
 
-	trackerData.open(trackerData.path());
-	trackerData >> files;
-	trackerData.open(trackerData.path());
+	ofFile trackerFile(trackerData);
+	trackerFile >> files;
 	filesSum.insert(filesSum.end(),files.getBinaryBuffer(), files.getBinaryBuffer()+files.size());
 
 	testmd5 = md5.getMD5(filesSum);
@@ -300,21 +311,21 @@ string Artvert::generateMD5(){
 }
 
 void Artvert::remove(){
-	compressedImage.remove();
-	roiFile.remove();
-	locationData.remove();
-	detectorData.remove();
-	trackerData.remove();
-	model.remove();
-	md5File.remove();
+	ofFile(compressedImage,ofFile::Reference).remove();
+	ofFile(roiPath,ofFile::Reference).remove();
+	ofFile(locationData,ofFile::Reference).remove();
+	ofFile(detectorData,ofFile::Reference).remove();
+	ofFile(trackerData,ofFile::Reference).remove();
+	ofFile(model,ofFile::Reference).remove();
+	ofFile(md5Path,ofFile::Reference).remove();
 	//TODO: remove data from xml
 }
 
 void Artvert::removeAnalisys(){
-	detectorData.remove();
-	trackerData.remove();
-	md5File.remove();
-	ofFile md5(md5File.path(),ofFile::WriteOnly);
+	ofFile(detectorData,ofFile::Reference).remove();
+	ofFile(trackerData,ofFile::Reference).remove();
+	ofFile(md5Path,ofFile::Reference).remove();
+	ofFile md5(md5Path,ofFile::WriteOnly);
 	md5 << generateMD5();
 	md5.close();
 

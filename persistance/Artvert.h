@@ -71,13 +71,13 @@ private:
 	string uid;
 	string aliasUID;
 	string folder;
-	ofFile compressedImage;
-	ofFile model;
-	ofFile roiFile;
-	ofFile detectorData;
-	ofFile trackerData;
-	ofFile locationData;
-	ofFile md5File;
+	string compressedImage;
+	string model;
+	string roiPath;
+	string detectorData;
+	string trackerData;
+	string locationData;
+	string md5Path;
 	vector<ofPoint> roi;
 };
 
