@@ -40,7 +40,18 @@ public:
 	ofFile getLocationFile() const;
 	ofFile getMD5File() const;
 
+	
+	
+	string getAdvertName() const { return advertName; }
+
+	string getDescription( ofFile & whichArtwork ) { return getAdvertName() + ": " + getTitle(whichArtwork) + " by " + getArtist(whichArtwork); }
+
+	string getTitle( ofFile & whichArtwork ) { return title[whichArtwork]; }
+	string getArtist( ofFile & whichArtwork ) { return artist[whichArtwork]; }
+
 	vector<ofFile> getArtverts();
+	
+	
 
 	vector<ofPoint> getROI();
 	ofxLocation getLocation();
@@ -68,6 +79,8 @@ public:
 	bool operator>=(const Artvert & file) const;
 
 private:
+	void updateArtworks();
+	
 	string uid;
 	string aliasUID;
 	string folder;
@@ -79,6 +92,11 @@ private:
 	ofFile locationData;
 	ofFile md5File;
 	vector<ofPoint> roi;
+	
+	string advertName;
+	map<ofFile,string> title;
+	map<ofFile,string> artist;
+	
 };
 
 
