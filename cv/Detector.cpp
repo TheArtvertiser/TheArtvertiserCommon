@@ -19,6 +19,9 @@ Detector::Detector() {
 
 	fps_time=0;
 	frames=0;
+
+	overrideWidth = -1;
+	overrideScale.makeIdentityMatrix();
 }
 
 Detector::~Detector() {
@@ -54,7 +57,7 @@ void Detector::setup(string _model, int _width, int _height, const vector<ofPoin
 	else init();
 }
 
-void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoint> & _srcQuad, bool lock){
+void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoint> & _srcQuad, bool lock, int _overrideWidth, int _overrideHeight ){
 	model = _model;
 	video = &_video;
 	srcQuad = _srcQuad;
@@ -63,8 +66,26 @@ void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoin
 	fern.setMode('5');
 	fern.setMode('0');
 
-	colorImg.allocate(video->getWidth(),video->getHeight());
-	img.allocate(video->getWidth(),video->getHeight());
+	overrideWidth = _overrideWidth;
+	overrideHeight = _overrideHeight;
+	
+	if ( overrideWidth > 0 )
+	{
+		width = overrideWidth;
+		height = overrideHeight;
+		overrideScale.makeScaleMatrix( (float)width/overrideWidth, (float)height/overrideHeight, 1.0f );
+	}
+	else
+	{
+		width = video->getWidth();
+		height = video->getHeight();
+		overrideScale.makeIdentityMatrix();
+	}
+	ofLogNotice( "Detector") << "running detection at " << width << "x" << height << " from camera " << video->getWidth() << "x" << video->getHeight();
+
+
+	colorImg.allocate(width, height );
+	img.allocate( width, height );
 	//img640.allocate(640,480);
 	img.setUseTexture(false);
 	colorImg.setUseTexture(false);
@@ -78,9 +99,6 @@ void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoin
 	ofGstVideoUtils * videoUtils = grabber->getGstVideoUtils();
 	ofAddListener(videoUtils->bufferEvent,this,&Detector::newFrame);
 #endif
-
-	width = video->getWidth();
-	height = video->getHeight();
 
 	trainOnly = false;
 	state = Initializing;
@@ -108,12 +126,30 @@ void Detector::setupTrainOnly(string _model){
 void Detector::newFrame(ofPixels & pixels){
 	if(state!=Running || !pixels.getPixels()) return;
 	if(pixels.getImageType()==OF_IMAGE_COLOR){
-		colorImg = pixels.getPixels();
+		if ( overrideWidth > 0 )
+		{
+			ofPixels tmpPixels = pixels;
+			tmpPixels.resize( overrideWidth, overrideHeight );
+			colorImg = tmpPixels.getPixels();
+		}
+		else
+		{
+			colorImg = pixels.getPixels();
+		}
 		img = colorImg;
 		fern.update(img);
 		//img640.scaleIntoMe(img);
 	}else{
-		fern.update(pixels);
+		if ( overrideWidth > 0 )
+		{
+			ofPixels tmpPixels = pixels;
+			tmpPixels.resize( overrideWidth, overrideHeight );
+			fern.update(tmpPixels);
+		}
+		else
+		{
+			fern.update( pixels );
+		}
 		//img640.scaleIntoMe(img,CV_INTER_LINEAR);
 	}
 	isNewFrame = true;
@@ -158,7 +194,7 @@ void Detector::threadedFunction(){
 
 ofMatrix4x4 Detector::getHomography(){
 	Poco::ScopedLock<ofMutex> l(mutex);
-	return homography;
+	return overrideScale*homography;
 }
 
 bool Detector::isDetected(){
