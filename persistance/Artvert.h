@@ -24,6 +24,9 @@ public:
 	string getUID() const;
 	void setUID(const string & uid);
 
+	string getAdvertName();
+	void setAdvertName(const string & name);
+
 	string getAliasUID() const;
 	void setAliasUID(const string & uid);
 	bool hasAlias() const;
@@ -91,9 +94,9 @@ private:
 	string trackerData;
 	string locationData;
 	string md5Path;
+	string advertName;
 	vector<ofPoint> roi;
 	
-	string advertName;
 	map<ofFile,string> title;
 	map<ofFile,string> artist;
 	

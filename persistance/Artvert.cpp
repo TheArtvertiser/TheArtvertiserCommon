@@ -46,7 +46,7 @@ Artvert::Artvert(string _uid,string folder)
 		if(uid==xml.getAttribute("artvert","uid","",i))
 		{
 			setAliasUID(xml.getAttribute("artvert","alias","",i));
-			advertName = xml.getAttribute( "artvert", "advertName", "unknown advert", i );	
+			advertName = xml.getAttribute( "artvert", "advertName", advertName, i );
 			break;
 		}
 		
@@ -126,7 +126,7 @@ void Artvert::setUID(const string & _uid){
 	for(int i=0; i<numAlias; i++){
 		if(uid==xml.getAttribute("artvert","uid","",i)){
 			setAliasUID(xml.getAttribute("artvert","alias","",i));
-			advertName = xml.getAttribute( "artvert", "advertName", "unknown advert", i );
+			advertName = xml.getAttribute( "artvert", "advertName", advertName, i );
 			
 			break;
 			
@@ -135,6 +135,15 @@ void Artvert::setUID(const string & _uid){
 	
 	updateArtworks();
 	
+}
+
+
+string Artvert::getAdvertName(){
+	return advertName;
+}
+
+void Artvert::setAdvertName(const string & _name){
+	advertName = _name;
 }
 
 string Artvert::getAliasUID() const{
@@ -251,7 +260,7 @@ void Artvert::save(){
 	int artvert = PersistanceEngine::artverts().addTag("artvert");
 	PersistanceEngine::artverts().addAttribute("artvert","uid",uid,artvert);
 	PersistanceEngine::artverts().addAttribute("artvert","alias",aliasUID,artvert);
-	PersistanceEngine::artverts().addAttribute("artvert","advertName", "unknown", artvert );
+	PersistanceEngine::artverts().addAttribute("artvert","advertName", advertName, artvert );
 	PersistanceEngine::save();
 	ofLogNotice("Artvert","artvert "+uid+" saved");
 }
