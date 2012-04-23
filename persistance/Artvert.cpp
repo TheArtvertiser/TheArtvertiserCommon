@@ -15,8 +15,8 @@ Artvert::Artvert()
 
 }
 
-Artvert::Artvert(string uid,string folder)
-:uid(uid)
+Artvert::Artvert(string _uid,string folder)
+:uid(_uid)
 ,folder(ofFilePath::addTrailingSlash(folder))
 ,compressedImage(folder + uid+".jpg")
 ,model(folder + uid+".bmp")
@@ -38,13 +38,64 @@ Artvert::Artvert(string uid,string folder)
 
 	ofxXmlSettings & xml = PersistanceEngine::artverts();
 	int numAlias = xml.getNumTags("artvert");
+	
+	ofLogVerbose("Artvert", "uid "+uid+": loading "+ofToString(numAlias) );
 
+	for(int i=0; i<numAlias; i++)
+	{
+		if(uid==xml.getAttribute("artvert","uid","",i))
+		{
+			setAliasUID(xml.getAttribute("artvert","alias","",i));
+			advertName = xml.getAttribute( "artvert", "advertName", "unknown advert", i );	
+			break;
+		}
+		
+	}
+	
+	updateArtworks();
+
+	
+}
+
+void Artvert::updateArtworks()
+{
+	
+	ofLogVerbose("Artvert", "uid "+uid+": found advertName "+advertName );
+	
+	ofxXmlSettings & xml = PersistanceEngine::artverts();
+	int numAlias = xml.getNumTags("artvert");
+	
 	for(int i=0; i<numAlias; i++){
 		if(uid==xml.getAttribute("artvert","uid","",i)){
-			setAliasUID(xml.getAttribute("artvert","alias","",i));
+			xml.pushTag("artvert",i);
+			int numArtworks = xml.getNumTags("artwork");
+			for ( int j=0; j<numArtworks; j++ )
+			{
+				xml.pushTag("artwork", j );
+				string path = xml.getValue( "file", "" );
+				ofFile file(path);
+				title[file] = xml.getValue( "title", "untitled" );
+				artist[file] = xml.getValue( "artist", "unknown" );
+				ofLogVerbose( "Artvert", ""+path+": "+title[file]+" by "+artist[file] );
+				
+				xml.popTag();
+			}
+			xml.popTag();
 			break;
 		}
 	}
+	
+	vector<ofFile> artworkFiles = getArtverts();
+	for ( int i=0; i<artworkFiles.size(); i++ )
+	{
+		if ( title.find( artworkFiles[i] ) == title.end() )
+		{
+			ofLog( OF_LOG_WARNING, "artvert %s: can't file artwork entry for artvert file %s, assuming default", 
+				  uid.c_str(), artworkFiles[i].path().c_str() );
+		}
+	}
+	
+
 }
 
 string Artvert::getUID() const{
@@ -75,9 +126,15 @@ void Artvert::setUID(const string & _uid){
 	for(int i=0; i<numAlias; i++){
 		if(uid==xml.getAttribute("artvert","uid","",i)){
 			setAliasUID(xml.getAttribute("artvert","alias","",i));
+			advertName = xml.getAttribute( "artvert", "advertName", "unknown advert", i );
+			
 			break;
+			
 		}
 	}
+	
+	updateArtworks();
+	
 }
 
 string Artvert::getAliasUID() const{
@@ -186,10 +243,17 @@ vector<ofFile> Artvert::getArtverts(){
 }
 
 void Artvert::save(){
-	if(aliasUID=="") return;
+	if(aliasUID!="")
+	{
+		ofLogWarning("Artvert","artvert "+uid+" not saving: has aliasUID");
+		return;
+	}
 	int artvert = PersistanceEngine::artverts().addTag("artvert");
 	PersistanceEngine::artverts().addAttribute("artvert","uid",uid,artvert);
 	PersistanceEngine::artverts().addAttribute("artvert","alias",aliasUID,artvert);
+	PersistanceEngine::artverts().addAttribute("artvert","advertName", "unknown", artvert );
+	PersistanceEngine::save();
+	ofLogNotice("Artvert","artvert "+uid+" saved");
 }
 
 vector<Artvert> Artvert::listAll(string folder){

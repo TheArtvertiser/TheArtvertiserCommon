@@ -13,7 +13,7 @@
 #include "CircularPB.h"
 #include "ofBaseTypes.h"
 
-#ifdef TARGET_LINUX
+#if defined TARGET_LINUX || defined TARGET_OSX
 struct ofxLocation{
 	double altitude;
 	double latitude;

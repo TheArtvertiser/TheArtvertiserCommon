@@ -5,7 +5,7 @@
  *      Author: arturo
  */
 
-#include <ofxMD5/ofxMD5.h>
+#include "ofxMD5/ofxMD5.h"
 
 /*
  * Print a signature

@@ -19,7 +19,7 @@ public:
 
 	void close();
 	void setup(string model, int width, int height, const vector<ofPoint> & srcQuad, bool lock=false);
-	void setup(string model, ofVideoGrabber & video, const vector<ofPoint> & srcQuad, bool lock=false);
+	void setup(string model, ofVideoGrabber & video, const vector<ofPoint> & srcQuad, bool lock=false, int _overrideWidth= -1, int _overrideHeight = -1 );
 	void setupTrainOnly(string model);
 	void newFrame(ofPixels & pixels);
 
@@ -46,12 +46,14 @@ protected:
 private:
 	void init();
 	ofVideoGrabber * video;
+	int overrideWidth, overrideHeight;
 	int width,height;
 	ofxCvColorImage colorImg;
 	ofxCvGrayscaleImage img, img640;
 	vector<ofPoint> srcQuad;
 	string model;
 	ofMatrix4x4 homography;
+	ofMatrix4x4 overrideScale;
 	ofMutex mutex;
 	float fps;
 	State state;

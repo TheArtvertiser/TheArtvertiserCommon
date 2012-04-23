@@ -16,11 +16,11 @@ Grid::Grid()
 ,vSpacing(0)
 ,wholescreen(true)
 {
-	ofAddListener(ofEvents.windowResized,this,&Grid::windowResized);
+	ofAddListener(ofEvents().windowResized,this,&Grid::windowResized);
 }
 
 Grid::~Grid(){
-	ofRemoveListener(ofEvents.windowResized,this,&Grid::windowResized);
+	ofRemoveListener(ofEvents().windowResized,this,&Grid::windowResized);
 }
 
 void Grid::setPosition(const ofPoint & _pos){

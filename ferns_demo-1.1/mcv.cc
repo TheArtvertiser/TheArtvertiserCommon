@@ -769,8 +769,8 @@ void mcvPut(IplImage * destImage, IplImage * imageToCopy, int x, int y)
   */
 	// Julien's version, handles clipping
 	CvMat dst, src;
-	int w = CV_MIN(imageToCopy->width, destImage->width-x);
-	int h = CV_MIN(imageToCopy->height, destImage->height-y);
+	int w = min(imageToCopy->width, destImage->width-x);
+	int h = min(imageToCopy->height, destImage->height-y);
 
 	cvGetSubRect(destImage, &dst, cvRect(x,y,w,h));
 	cvGetSubRect(imageToCopy, &src, cvRect(0,0,w,h));
