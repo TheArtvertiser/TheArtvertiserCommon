@@ -9,7 +9,7 @@
 #define OFXMD5_H_
 
 extern "C"{
-	#include "md5.h"
+	#include "md5-1.3.0/md5.h"
 }
 #include "ofConstants.h"
 #include "ofFileUtils.h"
