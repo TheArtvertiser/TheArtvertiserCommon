@@ -59,7 +59,7 @@ void Detector::setup(string _model, int _width, int _height, const vector<ofPoin
 
 void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoint> & _srcQuad, bool lock, int _overrideWidth, int _overrideHeight ){
 
-	Poco::ScopedLock<ofMutex> mlock(mutex);
+	Poco::ScopedLock<ofMutex> mlock(setupMutex);
 	video = &_video;
 #ifdef TARGET_ANDROID
 	ofxAndroidVideoGrabber * grabber = (ofxAndroidVideoGrabber*) video->getGrabber().get();
@@ -129,7 +129,7 @@ void Detector::setupTrainOnly(string _model){
 }
 
 void Detector::newFrame(ofPixels & pixels){
-	Poco::ScopedLock<ofMutex> lock(mutex);
+	Poco::ScopedLock<ofMutex> lock(setupMutex);
 	if(state!=Running || !pixels.getPixels()) return;
 	if(pixels.getImageType()==OF_IMAGE_COLOR){
 		if ( overrideWidth > 0 )
@@ -160,8 +160,9 @@ void Detector::newFrame(ofPixels & pixels){
 	}
 	isNewFrame = true;
 
+	mutex.lock();
 	findOpenCvHomography(&srcQuad[0],&fern.getLastQuad()[0],homography.getPtr());
-
+	mutex.unlock();
 
 	int curr_time = ofGetElapsedTimeMillis();
 	frames++;

@@ -54,7 +54,7 @@ private:
 	string model;
 	ofMatrix4x4 homography;
 	ofMatrix4x4 overrideScale;
-	ofMutex mutex;
+	ofMutex mutex, setupMutex;
 	float fps;
 	State state;
 	int counter;
