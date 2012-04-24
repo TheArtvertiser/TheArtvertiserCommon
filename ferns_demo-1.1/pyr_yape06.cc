@@ -53,7 +53,7 @@ pyr_yape06::pyr_yape06(void)
 pyr_yape06::~pyr_yape06(void)
 {
   delete [] all_keypoints;
-  release_managed_image(&laplacian);
+  if(laplacian) release_managed_image(&laplacian);
 }
 
 

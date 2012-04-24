@@ -46,6 +46,8 @@ planar_pattern_detector::planar_pattern_detector(void)
   maximum_number_of_points_to_detect = 500;
 
   H_estimator = new homography_estimator;
+  classifier = 0;
+  pyramid = 0;
 
 #ifdef USE_FAST
   fast = new cv::DynamicAdaptedFeatureDetector(new cv::FastAdjuster(20,true),100, maximum_number_of_points_to_detect, 10);
@@ -67,6 +69,11 @@ planar_pattern_detector::~planar_pattern_detector(void)
       delete [] match_probabilities[i];
     delete [] match_probabilities;
   }
+
+  delete H_estimator;
+  delete point_detector;
+  if(classifier) delete classifier;
+  if(pyramid) delete pyramid;
 }
 
 bool planar_pattern_detector::load(const char * filename)

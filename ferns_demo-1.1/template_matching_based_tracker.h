@@ -31,6 +31,7 @@ class template_matching_based_tracker
 {
  public:
   template_matching_based_tracker(void);
+  ~template_matching_based_tracker(void);
 
   bool load(const char * filename);
   void save(const char * filename);

@@ -67,6 +67,10 @@ homography_estimator::~homography_estimator(void)
   cvReleaseMat(&T2inv);
   cvReleaseMat(&tmp);
 
+  cvReleaseMat(&AA2);
+  cvReleaseMat(&B2);
+  cvReleaseMat(&X2);
+
   delete_managed_buffer(u_v_up_vp);
   delete_managed_buffer(normalized_u_v_up_vp);
   delete_managed_buffer(inliers);

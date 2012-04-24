@@ -29,6 +29,7 @@ using namespace std;
 
 fern_based_point_classifier::fern_based_point_classifier(char * filename)
 {
+	Ferns = 0;
   ifstream f(filename);
 
   if (!f.is_open()) {
@@ -44,6 +45,7 @@ fern_based_point_classifier::fern_based_point_classifier(char * filename)
 
 fern_based_point_classifier::fern_based_point_classifier(ifstream & f)
 {
+	Ferns = 0;
   load(f);
 }
 
@@ -77,6 +79,7 @@ fern_based_point_classifier::~fern_based_point_classifier()
   delete [] leaves_distributions;
   delete [] preallocated_distribution_for_a_keypoint;
   delete [] number_of_samples_for_class;
+  delete [] leaves_counters;
 }
 
 void fern_based_point_classifier::load(ifstream & f)

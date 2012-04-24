@@ -186,6 +186,16 @@ void ofxFern::detect(IplImage * frame){
 //------------------------------------------------------------------------
 void ofxFern::initTracker(string marker, int width, int height){
 	state = Initializing;
+
+	if( detector != NULL){
+		delete detector;
+		detector = NULL;
+	}
+	if( tracker != NULL){
+		delete tracker;
+		tracker = NULL;
+	}
+
 	ok = false;
 	last_frame_ok = false;
 	img.allocate(width, height); 

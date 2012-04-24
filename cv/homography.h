@@ -274,6 +274,10 @@ inline void findOpenCvHomography(ofPoint *src, ofPoint *dst, float homography[16
 	homography[7]		= matrix[7];
 	homography[15]		= matrix[8];
 
+	cvReleaseMat(&translate);
+	cvReleaseMat(&src_mat);
+	cvReleaseMat(&dst_mat);
+
 }
 
 

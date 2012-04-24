@@ -58,8 +58,22 @@ void Detector::setup(string _model, int _width, int _height, const vector<ofPoin
 }
 
 void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoint> & _srcQuad, bool lock, int _overrideWidth, int _overrideHeight ){
-	model = _model;
+
+	Poco::ScopedLock<ofMutex> mlock(mutex);
 	video = &_video;
+#ifdef TARGET_ANDROID
+	ofxAndroidVideoGrabber * grabber = (ofxAndroidVideoGrabber*) video->getGrabber().get();
+	ofAddListener(grabber->newFrameE,this,&Detector::newFrame);
+#elif defined (TARGET_LINUX)
+	ofGstVideoGrabber * grabber = (ofGstVideoGrabber*) video->getGrabber().get();
+	ofGstVideoUtils * videoUtils = grabber->getGstVideoUtils();
+#endif
+
+	ofRemoveListener(videoUtils->bufferEvent,this,&Detector::newFrame);
+	ofSleepMillis(500);
+
+
+	model = _model;
 	srcQuad = _srcQuad;
 
 	fern.setUseTexture(false);
@@ -83,7 +97,6 @@ void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoin
 	}
 	ofLogNotice( "Detector") << "running detection at " << width << "x" << height << " from camera " << video->getWidth() << "x" << video->getHeight();
 
-
 	colorImg.allocate(width, height );
 	img.allocate( width, height );
 	//img640.allocate(640,480);
@@ -91,19 +104,11 @@ void Detector::setup(string _model, ofVideoGrabber & _video, const vector<ofPoin
 	colorImg.setUseTexture(false);
 	//img640.setUseTexture(false);
 
-#ifdef TARGET_ANDROID
-	ofxAndroidVideoGrabber * grabber = (ofxAndroidVideoGrabber*) video->getGrabber().get();
-	ofAddListener(grabber->newFrameE,this,&Detector::newFrame);
-#elif defined (TARGET_LINUX)
-	ofGstVideoGrabber * grabber = (ofGstVideoGrabber*) video->getGrabber().get();
-	ofGstVideoUtils * videoUtils = grabber->getGstVideoUtils();
-	ofAddListener(videoUtils->bufferEvent,this,&Detector::newFrame);
-#endif
-
 	trainOnly = false;
 	state = Initializing;
 	if(!lock) startThread(true,false);
 	else init();
+	ofAddListener(videoUtils->bufferEvent,this,&Detector::newFrame);
 }
 
 void Detector::setupTrainOnly(string _model){
@@ -124,6 +129,7 @@ void Detector::setupTrainOnly(string _model){
 }
 
 void Detector::newFrame(ofPixels & pixels){
+	Poco::ScopedLock<ofMutex> lock(mutex);
 	if(state!=Running || !pixels.getPixels()) return;
 	if(pixels.getImageType()==OF_IMAGE_COLOR){
 		if ( overrideWidth > 0 )
@@ -154,9 +160,7 @@ void Detector::newFrame(ofPixels & pixels){
 	}
 	isNewFrame = true;
 
-	mutex.lock();
 	findOpenCvHomography(&srcQuad[0],&fern.getLastQuad()[0],homography.getPtr());
-	mutex.unlock();
 
 
 	int curr_time = ofGetElapsedTimeMillis();

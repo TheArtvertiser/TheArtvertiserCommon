@@ -30,16 +30,39 @@ using namespace std;
 ferns::ferns(int number_of_ferns, int number_of_tests_per_fern,
              int dx_min, int dx_max, int dy_min, int dy_max, int ds_min, int ds_max)
 {
+	preallocated_leaves_index = 0;
+	DX1 = 0;
+	DY1 = 0;
+	DS1 = 0;
+	DX2 = 0;
+	DY2 = 0;
+	DS2 = 0;
+	D_full_images = 0;
+
   alloc(number_of_ferns, number_of_tests_per_fern);
   pick_random_tests(dx_min, dx_max, dy_min, dy_max, ds_min, ds_max);
 
   width_full_images = height_full_images = -1;
-  for(int i = 0; i < maximum_number_of_octaves; i++)
+  for(int i = 0; i < maximum_number_of_octaves; i++){
     width_aztec_pyramid[i] = height_aztec_pyramid[i] = -1;
+  }
+
 }
 
 ferns::ferns(char * filename)
 {
+	preallocated_leaves_index = 0;
+	DX1 = 0;
+	DY1 = 0;
+	DS1 = 0;
+	DX2 = 0;
+	DY2 = 0;
+	DS2 = 0;
+	D_full_images = 0;
+  for(int i = 0; i < maximum_number_of_octaves; i++){
+		D_aztec_pyramid[i] = 0;
+
+  }
   ifstream f(filename);
 
   if (!f.is_open()) {
@@ -51,6 +74,21 @@ ferns::ferns(char * filename)
   load(f);
 
   f.close();
+}
+
+ferns::~ferns(){
+	if(preallocated_leaves_index) delete[] preallocated_leaves_index;
+	if(DX1) delete[] DX1;
+	if(DY1) delete[] DY1;
+	if(DS1) delete[] DS1;
+	if(DX2) delete[] DX2;
+	if(DY2) delete[] DY2;
+	if(DS2) delete[] DS2;
+	if(D_full_images) delete[] D_full_images;
+
+	for(int i = 0; i < maximum_number_of_octaves; i++)
+		if(D_aztec_pyramid[i]) delete [] D_aztec_pyramid[i];
+	//delete[] D_aztec_pyramid;
 }
 
 ferns::ferns(ifstream & f)

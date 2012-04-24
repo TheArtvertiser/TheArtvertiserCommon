@@ -39,6 +39,7 @@ class ferns
 
   ferns(char * filename);
   ferns(ifstream & f);
+  ~ferns();
   bool correctly_read;
 
   bool save(char * filename);

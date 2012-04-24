@@ -86,6 +86,20 @@ bool template_matching_based_tracker::load(const char * filename)
   return true;
 }
 
+template_matching_based_tracker::~template_matching_based_tracker(void){
+	cvReleaseMat(&U0);
+	cvReleaseMat(&U);
+	cvReleaseMat(&I0);
+	cvReleaseMat(&I1);
+	cvReleaseMat(&DI);
+	cvReleaseMat(&DU);
+	for(int i = 0; i < number_of_levels; i++) {
+		cvReleaseMat(&As[i]);
+	}
+	delete[] As;
+	delete[] m;
+}
+
 void template_matching_based_tracker::save(const char * filename)
 {
   ofstream f(filename);

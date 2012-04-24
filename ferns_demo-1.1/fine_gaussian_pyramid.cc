@@ -123,6 +123,9 @@ void fine_gaussian_pyramid::free(void)
   add_a_row = 0;
   add_a_col = 0;
 
+  if(intermediate_int_image)
+	  cvReleaseImage(&intermediate_int_image);
+
   intermediate_int_image = 0;
 }
 
