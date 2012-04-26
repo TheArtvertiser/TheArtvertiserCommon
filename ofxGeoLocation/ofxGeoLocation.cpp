@@ -17,6 +17,7 @@ ofxGeoLocation::ofxGeoLocation()
 ,init(true)
 ,width(320)
 ,height(240)
+,started(false)
 {
 	image.setUseTexture(false);
 	texImage.loadImage("geo/blank.png");
@@ -36,6 +37,7 @@ void ofxGeoLocation::start(){
 #endif
 	queryMap();
 	queryAddress();
+	started = true;
 }
 
 void ofxGeoLocation::stop(){
@@ -48,6 +50,11 @@ void ofxGeoLocation::stop(){
 	image.loadImage("geo/blank.png");
 	imageChanged = true;
 	ofRemoveAllURLRequests();
+}
+
+
+bool ofxGeoLocation::isStarted(){
+	return started;
 }
 
 void ofxGeoLocation::setLocation(ofxLocation & location){

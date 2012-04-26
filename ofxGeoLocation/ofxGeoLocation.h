@@ -13,7 +13,7 @@
 #include "CircularPB.h"
 #include "ofBaseTypes.h"
 
-#if defined TARGET_LINUX || defined TARGET_OSX
+#ifndef TARGET_ANDROID
 struct ofxLocation{
 	double altitude;
 	double latitude;
@@ -44,6 +44,8 @@ public:
 
 	void start();
 	void stop();
+
+	bool isStarted();
 
 	void setLocation(ofxLocation & location);
 
@@ -103,6 +105,7 @@ private:
 	float width,height;
 
 	ofURLFileLoader urlLoader;
+	bool started;
 };
 
 #endif /* GEO_H_ */
