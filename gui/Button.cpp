@@ -137,6 +137,7 @@ void Button::updateState(Transition transition){
 		}else if(state==Pressed){
 			state=OutPressed;
 		}
+		break;
 	}
 	//cout << state << endl;
 }
